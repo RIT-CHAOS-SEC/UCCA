@@ -1,0 +1,19 @@
+-- Reset Variables 
+    RESET_HANDLER := 0uh16_0000;
+    reset := bool("reset");
+    return_reset := bool("return_reset");
+    stack_reset := bool("stack_reset");
+    integrity_reset := bool("integrity_reset");
+    
+
+-----------------------------
+-----UCCA s PROPERTIES-----
+-----------------------------
+
+-- Reset correctness
+LTLSPEC G(reset -> ((reset U "pc" = RESET_HANDLER) | G(reset)));
+
+
+-- Reset Equivalence 
+LTLSPEC G ( (integrity_reset | return_reset | stack_reset) <-> reset );
+

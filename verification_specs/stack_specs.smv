@@ -1,0 +1,33 @@
+-- UCC definition
+    UCCMin := "ucc_min";
+    UCCMax := "ucc_max";
+    
+-- Saved Base Pointer
+    BP := "base_pointer";
+
+-- Execution Assumptions
+    valid_region := UCCMin < UCCMax;
+    immutability := UCCMin = next(UCCMin) & UCCMax = next(UCCMax);
+    
+-- UCC states
+    pc_in_UCC := "pc" >= UCCMin & "pc" <= (UCCMax);
+    next_pc_in_UCC := next("pc") >= UCCMin & next("pc") <= UCCMax;
+    not_pc_in_UCC := !pc_in_UCC;
+
+-- Reset Variables
+    reset := bool("reset");
+
+----------------------------------------
+-- Stack Protection Module Properties --
+----------------------------------------
+
+-- Base Pointer Protection
+LTLSPEC G(immutability & valid_region) -> G(reset -> ((((Y("pc") != "pc") -> (Y("stack_pointer") = BP) | reset) U pc_in_UCC) | G((Y("pc") != "pc") -> (Y("stack_pointer") = BP) | reset)));
+LTLSPEC G(immutability & valid_region) -> G(!pc_in_UCC & next_pc_in_UCC -> (X(BP) = BP) | reset);
+LTLSPEC G(immutability & valid_region) -> G(pc_in_UCC & !Y(pc_in_UCC) -> ((((next(BP) = BP) | reset) U !pc_in_UCC) | G((next(BP) = BP) | reset)));
+LTLSPEC G(immutability & valid_region) -> G(!pc_in_UCC & Y(pc_in_UCC) & !Y("irq_jmp") -> ((((Y("pc") != "pc") -> (Y("stack_pointer") = BP) | reset) U pc_in_UCC) | G((Y("pc") != "pc") -> (Y("stack_pointer") = BP) | reset)));
+LTLSPEC G(immutability & valid_region & ("irq_jmp" -> !next("irq_jmp"))) -> G(!pc_in_UCC & Y(pc_in_UCC) & Y("irq_jmp") &!Y(reset)->   (((next(BP) = BP) U (pc_in_UCC | reset)) | G(next(BP) = BP))); 
+
+-- Stack Protection
+LTLSPEC G(immutability & valid_region) -> G(pc_in_UCC & "data_wr" & ("data_addr" >= BP) -> reset);
+LTLSPEC G(immutability & valid_region) -> G(pc_in_UCC & !next_pc_in_UCC & !("irq_jmp") & !(reset) -> X("stack_pointer") = BP | X(reset));

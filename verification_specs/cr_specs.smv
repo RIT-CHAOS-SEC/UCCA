@@ -1,0 +1,14 @@
+-- Configuration Region Definition
+    META_BASE := 0uh16_0160;
+    META_SIZE := 0uh16_0004;
+    LAST_META := META_BASE + META_SIZE;
+
+-- CR State
+    daddr_not_in_CR := "data_addr" < META_BASE | "data_addr" > LAST_META;
+    daddr_in_CR := !daddr_not_in_CR;
+
+----------------------------------------
+-- CR Integrity Module Property --
+----------------------------------------
+LTLSPEC G (daddr_in_CR & "data_wr" -> "reset");
+

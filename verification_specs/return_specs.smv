@@ -1,0 +1,34 @@
+-- UCC definition
+    UCCMin := "ucc_min";
+    UCCMax := "ucc_max";
+    
+-- Saved Return Address
+    ret_addr := "return_address";
+
+-- Execution Assumptions
+    valid_region := UCCMin < UCCMax;
+    immutability := UCCMin = next(UCCMin) & UCCMax = next(UCCMax);
+    
+-- UCC states
+    pc_in_UCC := "pc" >= UCCMin & "pc" <= (UCCMax);
+    next_pc_in_UCC := next("pc") >= UCCMin & next("pc") <= UCCMax;
+    not_pc_in_UCC := !pc_in_UCC;
+    
+-- Return Validity
+    valid_return := next("pc") = ret_addr;
+
+-- Reset Variables
+    reset := bool("reset");
+
+----------------------------------------
+-- Return Integrity Module Properties --
+----------------------------------------
+
+-- Saved Return Correctness
+LTLSPEC G(immutability & valid_region) -> G(reset -> ((((!pc_in_UCC & next_pc_in_UCC) -> (next(ret_addr) = "op_dest") | reset) U pc_in_UCC) | G((!pc_in_UCC & next_pc_in_UCC) -> (next(ret_addr) = "op_dest") | reset)));
+LTLSPEC G(immutability & valid_region) -> G(pc_in_UCC & !Y(pc_in_UCC) -> ((((next(ret_addr) = ret_addr) | reset) U !pc_in_UCC) | G((next(ret_addr) = ret_addr) | reset)));
+LTLSPEC G(immutability & valid_region) -> G(!pc_in_UCC & Y(pc_in_UCC) & !Y("irq_jmp") -> (((next_pc_in_UCC -> (next(ret_addr) = "op_dest") | reset) U pc_in_UCC) | G(next_pc_in_UCC -> (next(ret_addr) = "op_dest") | reset)));
+LTLSPEC G(immutability & valid_region & ("irq_jmp" -> !next("irq_jmp"))) -> G(!pc_in_UCC & Y(pc_in_UCC) & Y ("irq_jmp") & !Y(reset) -> (((next(ret_addr) = ret_addr) U (pc_in_UCC | reset)) | G(next(ret_addr) = ret_addr)));
+
+-- Return Integrity
+LTLSPEC G(immutability & valid_region) -> G(!reset & pc_in_UCC & !next_pc_in_UCC & !"irq_jmp" -> valid_return | next(reset));
