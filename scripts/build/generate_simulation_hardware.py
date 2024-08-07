@@ -119,6 +119,25 @@ def build_hwmod(num_uccs):
         output_fp.write(template_file)
 
 
+
+def build_cr_integrity(num_uccs):
+    """
+    Updates CR_integrity module to protect the right memory range
+    :param num_uccs: (int) The number of UCCs supported (shocking I know)
+    :return: None
+    """
+    with open(f"{HARDWARE_TEMPLATE_DIR}CR_integrity.v", "r") as template_fp:
+        template_file = template_fp.read()
+    
+    cr_end = hex(352 + (4*num_uccs))[2:]
+    cr_end = cr_end.zfill(4)
+
+    template_file = template_file.replace("CR_END", f"16'h{cr_end};")
+
+    with open(f"{UCCA_DIR}CR_integrity.v", "w") as output_fp:
+        output_fp.write(template_file)
+
+
 def main():
     num_uccs = int(sys.argv[1])
     if num_uccs == -1:
@@ -129,6 +148,7 @@ def main():
     build_fpga(num_uccs)
     build_msp(num_uccs)
     build_hwmod(num_uccs)
+    build_cr_integrity(num_uccs)
 
 
 if __name__ == '__main__':

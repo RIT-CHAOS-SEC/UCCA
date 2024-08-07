@@ -73,6 +73,7 @@ def update_ucc_definitions(app_name, matches):
         app_file = app_file.replace(f'"{i+1}Sta"', f"0xFFFF")
         app_file = app_file.replace(f'"{i+1}Sto"', f"0xFFFF")
 
+    app_file = app_file.replace("CR_SIZE", str(4*len(matches)))
     with open(f"{APP_DIR}{app_name}/main.c", "w") as app_fp:
         app_fp.write(app_file)
 

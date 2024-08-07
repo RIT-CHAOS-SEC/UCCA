@@ -18,7 +18,7 @@ output       reset;
 
 // Region definitions in memory //////////////////////////////////////////
 parameter META_BASE = 16'h0160;
-parameter META_END  = 16'h016c;
+parameter META_END  = CR_END
 
 // FSM States /////
 parameter RUN = 1'b0;

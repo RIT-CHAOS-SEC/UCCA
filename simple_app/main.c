@@ -9,7 +9,7 @@
 //#define WDTPW               (0x5A00)
 
 #define METADATA_START 0x160
-#define METADATA_END  (METADATA_START + 8) // 4 bytes per region and assuming 2 regions
+#define METADATA_END  (METADATA_START + 12) // 4 bytes per region and assuming 2 regions
 
 // How to define uccmin and uccmax in memory for different regions.
 // While all tests only use three regions, this file shows how to specify 

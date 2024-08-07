@@ -9,7 +9,7 @@
 //#define WDTPW               (0x5A00)
 
 #define METADATA_START 0x160
-#define METADATA_END  (METADATA_START + 8) // 4 bytes per region and assuming 2 regions
+#define METADATA_END  (METADATA_START + CR_SIZE) // 4 bytes per region and assuming 2 regions
 
 // UCC definition placeholders. If more than eight regions are required simply
 // copy these lines and update them accordingly. Also ensure to update scripts/linker.msp430.x 
