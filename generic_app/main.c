@@ -11,21 +11,21 @@
 #define METADATA_START 0x160
 #define METADATA_END  (METADATA_START + 8) // 4 bytes per region and assuming 2 regions
 
-// How to define uccmin and uccmax in memory for different regions.
-// While all tests only use two regions, this file shows how to specify 
-// more regions for larger tests
+// UCC definition placeholders. If more than eight regions are required simply
+// copy these lines and update them accordingly. Also ensure to update scripts/linker.msp430.x 
+// to create more labeled memory.
 uint16_t ucc1min __attribute__((section (".ucc1min"))) = 0xe23e;
 uint16_t ucc1max __attribute__((section (".ucc1max"))) = 0xe296;
 uint16_t ucc2min __attribute__((section (".ucc2min"))) = 0xe298;
 uint16_t ucc2max __attribute__((section (".ucc2max"))) = 0xe2f4;
-uint16_t ucc3min __attribute__((section (".ucc3min"))) = 0xe2f6;
-uint16_t ucc3max __attribute__((section (".ucc3max"))) = 0xe352;
-uint16_t ucc4min __attribute__((section (".ucc4min"))) = 0xe354;
-uint16_t ucc4max __attribute__((section (".ucc4max"))) = 0xe4ca;
-uint16_t ucc5min __attribute__((section (".ucc5min"))) = 0xe4cc;
-uint16_t ucc5max __attribute__((section (".ucc5max"))) = 0xe528;
-uint16_t ucc6min __attribute__((section (".ucc6min"))) = 0xe52a;
-uint16_t ucc6max __attribute__((section (".ucc6max"))) = 0xe586;
+uint16_t ucc3min __attribute__((section (".ucc3min"))) = 0xFFFF;
+uint16_t ucc3max __attribute__((section (".ucc3max"))) = 0xFFFF;
+uint16_t ucc4min __attribute__((section (".ucc4min"))) = 0xFFFF;
+uint16_t ucc4max __attribute__((section (".ucc4max"))) = 0xFFFF;
+uint16_t ucc5min __attribute__((section (".ucc5min"))) = 0xFFFF;
+uint16_t ucc5max __attribute__((section (".ucc5max"))) = 0xFFFF;
+uint16_t ucc6min __attribute__((section (".ucc6min"))) = 0xFFFF;
+uint16_t ucc6max __attribute__((section (".ucc6max"))) = 0xFFFF;
 uint16_t ucc7min __attribute__((section (".ucc7min"))) = 0xFFFF;
 uint16_t ucc7max __attribute__((section (".ucc7max"))) = 0xFFFF;
 uint16_t ucc8min __attribute__((section (".ucc8min"))) = 0xFFFF;
@@ -91,125 +91,7 @@ __attribute__ ((section (".region_2"))) int passwordComparison(char *actual, cha
     }
 }
 
-__attribute__ ((section (".region_3"))) int test_one(char *actual, char *attempt){
-    int n = strlen(actual);
-    int m = strlen(attempt);
-    
-    if (n!=m){
-        return -1;
-    }else{
-        for(int i=0; i<n; i++){
-            if (actual[i] != attempt[i]){
-                return -1;
-            }
-        }
-        return 0;
-    }
-}
-
-__attribute__ ((section (".region_4"))) int test_two(char *actual, char *attempt){
-    int n = strlen(actual);
-    int m = strlen(attempt);
-    
-    if (n!=m){
-        return -1;
-    }else{
-        for(int i=0; i<n; i++){
-            if (actual[i] != attempt[i]){
-                return -1;
-            }
-        }
-        return 0;
-    }
-}
-
-__attribute__ ((section (".region_4"))) int test_three(char *actual, char *attempt){
-    int n = strlen(actual);
-    int m = strlen(attempt);
-    
-    if (n!=m){
-        return -1;
-    }else{
-        for(int i=0; i<n; i++){
-            if (actual[i] != attempt[i]){
-                return -1;
-            }
-        }
-        return 0;
-    }
-}
-
-__attribute__ ((section (".region_4"))) int test_four(char *actual, char *attempt){
-    int n = strlen(actual);
-    int m = strlen(attempt);
-    
-    if (n!=m){
-        return -1;
-    }else{
-        for(int i=0; i<n; i++){
-            if (actual[i] != attempt[i]){
-                return -1;
-            }
-        }
-        return 0;
-    }
-}
-__attribute__ ((section (".region_4"))) int test_five(char *actual, char *attempt){
-    int n = strlen(actual);
-    int m = strlen(attempt);
-    
-    if (n!=m){
-        return -1;
-    }else{
-        for(int i=0; i<n; i++){
-            if (actual[i] != attempt[i]){
-                return -1;
-            }
-        }
-        return 0;
-    }
-}
-__attribute__ ((section (".region_5"))) int test_six(char *actual, char *attempt){
-    //this 
-    //is 
-    // a
-    // test
-    
-    
-    int n = strlen(actual);
-    int m = strlen(attempt);
-    
-    if (n!=m){
-        return -1;
-    }else{
-        for(int i=0; i<n; i++){
-            if (actual[i] != attempt[i]){
-                return -1;
-            }
-        }
-        return 0;
-    }
-}
-
-__attribute__ ((section (".region_6"))) int test_seven(char *actual, char *attempt){
-    /* how about
-    if i 
-    do this */
-    int n = strlen(actual);
-    int m = strlen(attempt);
-    
-    if (n!=m){
-        return -1;
-    }else{
-        for(int i=0; i<n; i++){
-            if (actual[i] != attempt[i]){
-                return -1;
-            }
-        }
-        return 0;
-    }
-}
-
+// A dummy ISR
 ISR(PORT1,TCB){
 	P1IFG &= ~P1IFG;
 	P5OUT = ~P5OUT;
@@ -218,6 +100,12 @@ ISR(PORT1,TCB){
 
 // MAIN /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/* By defualt this file is the same as simple app. However unlike simple app,
+  this file allows you to add and isolate any code. Simply add whatever program you 
+  want to test with and mark the untrusted functionality with the appropriate 
+  __attribute__ tag. If you need more than 8 UCCs you will need to add more region definitions
+  to the top of this file as well as to scripts/linker.msp430.x
+*/
 int main(void)
 {
 
@@ -239,30 +127,28 @@ int main(void)
 
          while (1){
          
+            // Test Setup
             char *buffer = malloc(6);
             char *buffer_two = malloc(5);
             memset(buffer, 0, 6);
             memset(buffer_two, 0, 5);
             
             int result = -1;
-            int test_result = -1;
             
+        // Execution enters the first UCC
 	    getUserInput(buffer, input);
+        // Demonstrates that the program can freely call any function within a UCC
 	    stringCopy(buffer_two, "test");
 	     
-	    
+	    // Entering UCC two
 	    result = passwordComparison(buffer, test_password);
-	    test_result = test_one(buffer, test_password);
-	    test_result = test_two(buffer, test_password);
-	    test_result = test_three(buffer, test_password);
-	    test_result = test_four(buffer, test_password);
-	    test_result = test_five(buffer, test_password);
-	    test_result = test_six(buffer, test_password);
-	    test_result = test_seven(buffer, test_password);
 	    
+        // The "Secure" functionality
 	    if (result == 0){
 	        secureFunction();
 	    }
+
+        // Cleanup
 	    free(buffer);
 	    free(buffer_two);
 	}

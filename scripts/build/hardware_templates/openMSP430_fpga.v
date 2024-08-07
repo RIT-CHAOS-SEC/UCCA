@@ -368,8 +368,7 @@ wire        [15:0] per_dout_uart;
 wire               hw_uart_txd;
 wire               hw_uart_rxd;
 
-// CR wires
-
+// CR peripheral wires
 wire        [15:0] per_dout_cr_peripheral;
 UCC_WIRES
 
@@ -580,7 +579,7 @@ openMSP430 openMSP430_0 (
     .scan_mode         (1'b0),         // ASIC ONLY: Scan mode
     .wkup              (1'b0),          // ASIC ONLY: System Wake-up (asynchronous and non-glitchy)
     
-    
+    // Passing the UCC defintions into the MSP430 core  
 UCC_INPUTS
 
     
@@ -739,6 +738,9 @@ omsp_uart #(.BASE_ADDR(15'h0080)) uart_0 (
 // Four-Digit, Seven-Segment LED Display driver
 //----------------------------------------------
 
+//
+// The CR peripheral storing the UCC definitions
+//----------------------------------------------
 CR_peripheral CR_peripheral_0 (
 
 // OUTPUTs

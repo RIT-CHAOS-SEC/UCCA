@@ -105,7 +105,7 @@ module  openMSP430 (
     scan_mode,                               // ASIC ONLY: Scan mode
     wkup,                                    // ASIC ONLY: System Wake-up (asynchronous and non-glitchy)
     
-//UCCA-M Inputs
+    //UCCA Inputs
 UCC_DEFS
 
     
@@ -278,10 +278,10 @@ wire [`SKEY_MSB:0] skey_addr;
 wire               skey_cen;
 wire        [15:0] skey_dout;
 
-// more wires -- for precise currently executed pc and irq detection
-wire          [15:0] inst_pc;
-wire                 irq_detect;
-wire          [15:0] stack_pointer;
+// more UCCA wires
+wire          [15:0] inst_pc;  // precise currently executing PC
+wire                 irq_detect;  // whether an interrupt is occurring
+wire          [15:0] stack_pointer; // the currrent stack pointer
 
 //=============================================================================
 // 2)  GLOBAL CLOCK & RESET MANAGEMENT
@@ -330,8 +330,8 @@ omsp_clock_module clock_module_0 (
     .scan_mode         (scan_mode),          // Scan mode
     .scg0              (scg0),               // System clock generator 1. Turns off the DCO
     .scg1              (scg1),               // System clock generator 1. Turns off the SMCLK
-    .wdt_reset         (wdt_reset),           // Watchdog-timer reset
-    .ucca_reset        (ucca_reset)
+    .wdt_reset         (wdt_reset),          // Watchdog-timer reset
+    .ucca_reset        (ucca_reset)          // The master UCCA reset wire
 );
 
 assign mclk = dma_mclk;
@@ -564,8 +564,16 @@ omsp_mem_backbone mem_backbone_0 (
     .scan_enable       (scan_enable)         // Scan enable (active during scan shifting)
 );
 
-wire               irq_jmp = (e_state == 4'hb & inst_so == 8'h80);
 
+//
+//=============================================================================
+//  UCCA
+//=============================================================================
+
+// whether a jump to an ISR is occuring
+wire  irq_jmp = (e_state == 4'hb & inst_so == 8'h80); 
+
+// A module to detect the return address being written to the stack
 wire [15:0] op_dest;
 return_address_tracker return_address_tracker_0(
     .clk (dma_mclk),
@@ -576,6 +584,7 @@ return_address_tracker return_address_tracker_0(
     .ret_addr (op_dest)
 );
 
+// UCCA hardware
 hwmod hdmod_0(
     .clk            (dma_mclk),
     .pc             (inst_pc),

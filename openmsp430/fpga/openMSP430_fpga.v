@@ -368,8 +368,7 @@ wire        [15:0] per_dout_uart;
 wire               hw_uart_txd;
 wire               hw_uart_rxd;
 
-// CR wires
-
+// CR peripheral wires
 wire        [15:0] per_dout_cr_peripheral;
 wire        [15:0] ucc_min_0;
 wire        [15:0] ucc_max_0;
@@ -377,17 +376,7 @@ wire        [15:0] ucc_min_1;
 wire        [15:0] ucc_max_1;
 wire        [15:0] ucc_min_2;
 wire        [15:0] ucc_max_2;
-/*wire        [15:0] ucc_min_3;
-wire        [15:0] ucc_max_3;
-/*wire        [15:0] ucc_min_4;
-wire        [15:0] ucc_max_4;
-/*wire        [15:0] ucc_min_5;
-wire        [15:0] ucc_max_5;
-/*wire        [15:0] ucc_min_6;
-wire        [15:0] ucc_max_6;
-/*wire        [15:0] ucc_min_7;
-wire        [15:0] ucc_max_7;
-/**/
+
 
 // Others
 wire               reset_pin;
@@ -596,24 +585,14 @@ openMSP430 openMSP430_0 (
     .scan_mode         (1'b0),         // ASIC ONLY: Scan mode
     .wkup              (1'b0),          // ASIC ONLY: System Wake-up (asynchronous and non-glitchy)
     
-    
-    .ucc_min_0         (ucc_min_0),        
-    .ucc_max_0         (ucc_max_0),       
-    .ucc_min_1         (ucc_min_1),        
-    .ucc_max_1         (ucc_max_1), 
-    .ucc_min_2         (ucc_min_2),        
-    .ucc_max_2         (ucc_max_2) 
-    /*.ucc_min_3         (ucc_min_3),        
-    .ucc_max_3         (ucc_max_3), 
-    /*.ucc_min_4         (ucc_min_4),        
-    .ucc_max_4         (ucc_max_4), 
-    /*.ucc_min_5         (ucc_min_5),        
-    .ucc_max_5         (ucc_max_5), 
-    /*.ucc_min_6         (ucc_min_6),        
-    .ucc_max_6         (ucc_max_6), 
-    /*.ucc_min_7         (ucc_min_7),        
-    .ucc_max_7         (ucc_max_7), 
-    /**/
+    // Passing the UCC defintions into the MSP430 core  
+    .ucc_min_0         (ucc_min_0),
+    .ucc_max_0         (ucc_max_0),
+    .ucc_min_1         (ucc_min_1),
+    .ucc_max_1         (ucc_max_1),
+    .ucc_min_2         (ucc_min_2),
+    .ucc_max_2         (ucc_max_2)
+
     
 );
 
@@ -770,27 +749,20 @@ omsp_uart #(.BASE_ADDR(15'h0080)) uart_0 (
 // Four-Digit, Seven-Segment LED Display driver
 //----------------------------------------------
 
+//
+// The CR peripheral storing the UCC definitions
+//----------------------------------------------
 CR_peripheral CR_peripheral_0 (
 
 // OUTPUTs
     .per_dout     (per_dout_cr_peripheral), // Peripheral data output
-    .ucc_min_0    (ucc_min_0),        
-    .ucc_max_0    (ucc_max_0),        
-    .ucc_min_1    (ucc_min_1),        
-    .ucc_max_1    (ucc_max_1), 
-    .ucc_min_2    (ucc_min_2),        
-    .ucc_max_2    (ucc_max_2) 
-    /*.ucc_min_3    (ucc_min_3),        
-    .ucc_max_3    (ucc_max_3), 
-    /*.ucc_min_4    (ucc_min_4),        
-    .ucc_max_4    (ucc_max_4), 
-    /*.ucc_min_5    (ucc_min_5),        
-    .ucc_max_5    (ucc_max_5), 
-    /*.ucc_min_6    (ucc_min_6),        
-    .ucc_max_6    (ucc_max_6), 
-    /*.ucc_min_7    (ucc_min_7),        
-    .ucc_max_7    (ucc_max_7), 
-    /**/
+    .ucc_min_0    (ucc_min_0),
+    .ucc_max_0    (ucc_max_0),
+    .ucc_min_1    (ucc_min_1),
+    .ucc_max_1    (ucc_max_1),
+    .ucc_min_2    (ucc_min_2),
+    .ucc_max_2    (ucc_max_2)
+
 );
 
 

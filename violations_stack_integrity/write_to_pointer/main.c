@@ -11,25 +11,13 @@
 #define METADATA_START 0x160
 #define METADATA_END  (METADATA_START + 8) // 4 bytes per region and assuming 2 regions
 
-// How to define uccmin and uccmax in memory for different regions.
-// While all tests only use two regions, this file shows how to specify 
-// more regions for larger tests
+// UCC definitions
 uint16_t ucc1min __attribute__((section (".ucc1min"))) = 0xE23E;
 uint16_t ucc1max __attribute__((section (".ucc1max"))) = 0xE296;
 uint16_t ucc2min __attribute__((section (".ucc2min"))) = 0xE298;
 uint16_t ucc2max __attribute__((section (".ucc2max"))) = 0xE2F4;
 uint16_t ucc3min __attribute__((section (".ucc3min"))) = 0xE0FC;
 uint16_t ucc3max __attribute__((section (".ucc3max"))) = 0xE126;
-//uint16_t ucc4min __attribute__((section (".ucc4min"))) = 0xE444;
-//uint16_t ucc4max __attribute__((section (".ucc4max"))) = 0xE445;
-//uint16_t ucc5min __attribute__((section (".ucc5min"))) = 0xE555;
-//uint16_t ucc5max __attribute__((section (".ucc5max"))) = 0xE556;
-//uint16_t ucc6min __attribute__((section (".ucc6min"))) = 0xE621;
-//uint16_t ucc6max __attribute__((section (".ucc6max"))) = 0xE667;
-//uint16_t ucc7min __attribute__((section (".ucc7min"))) = 0xE777;
-//uint16_t ucc7max __attribute__((section (".ucc7max"))) = 0xE778;
-//uint16_t ucc8min __attribute__((section (".ucc8min"))) = 0xE888;
-//uint16_t ucc8max __attribute__((section (".ucc8max"))) = 0xE889;
 
 
 /**
@@ -92,7 +80,7 @@ __attribute__ ((section (".regionTwo"))) int passwordComparison(char *actual, ch
     }
 }
 
-
+// A dummy ISR
 ISR(PORT1,TCB){
 	P1IFG &= ~P1IFG;
 	__asm__ volatile("br #0xe29a" "\n\t");
@@ -123,21 +111,28 @@ int main(void)
 
          while (1){
          
+            // Test Setup
             char *buffer_two = malloc(5);
             memset(buffer_two, 0, 5);
             
             char buffer[6] = {'\0'};
             int result = -1;
-            
+        
+        // Execution enters the first UCC
 	    getUserInput(buffer, input);
+        // Attempts to write to buffer_two will violate stack integrity
+        //   as buffer_two is defined outside UCC one's frame
 	    stringCopy(buffer_two, "test");
 	     
-	    
+	    // Entering UCC two
 	    result = passwordComparison(buffer, test_password);
 	    
+        // The "Secure" functionality
 	    if (result == 0){
 	        secureFunction();
 	    }
+
+        // Cleanup
 	    free(buffer);
 	    free(buffer_two);
 	}
