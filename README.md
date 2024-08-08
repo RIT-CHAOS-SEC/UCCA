@@ -362,6 +362,8 @@ The UCCs for this test are defined for the following regions of memory: E242-E29
 
 Like previous interrupt-based tests, this behavior can be performed anytime after the first 30 microseconds of the simulation. However, to best demonstrate the unlocking of the stack for interrupts the interrupt should be triggered from within another UCC. Execution first enters a UCC around 101 microseconds into the execution. From there simply trigger the interrupt. The ISR should run normally and execution will then return to the UCC.
 
+**Note:** While the ISR write is valid, this test is just blindly writing to the stack. As such this demonstration will likely break the program. However this does not reflect an attack against UCCA as it is assumed unisolated code is benign. Thus in reality, an unisolated ISR would not (presumably) be purposely destroying the stack.
+
 ###### 8.3- malicious_stack_write_complex
 
 This corresponds to a test case where a UCC attempts to write to an address on the stack below its own stack frame (D_addr below Base Pointer). Exploiting the vulnerable buffer within the "getUserInput" function causes UCC to attempt to write below its Base Pointer. This violates the stack isolation, ucca_reset is set to 1 and the device is reset (pc = 0).

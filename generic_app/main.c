@@ -9,17 +9,17 @@
 //#define WDTPW               (0x5A00)
 
 #define METADATA_START 0x160
-#define METADATA_END  (METADATA_START + 8) // 4 bytes per region and assuming 2 regions
+#define METADATA_END  (METADATA_START + 12) // 4 bytes per region and assuming 2 regions
 
 // UCC definition placeholders. If more than eight regions are required simply
 // copy these lines and update them accordingly. Also ensure to update scripts/linker.msp430.x 
 // to create more labeled memory.
-uint16_t ucc1min __attribute__((section (".ucc1min"))) = 0xe23e;
-uint16_t ucc1max __attribute__((section (".ucc1max"))) = 0xe296;
-uint16_t ucc2min __attribute__((section (".ucc2min"))) = 0xe298;
-uint16_t ucc2max __attribute__((section (".ucc2max"))) = 0xe2f4;
-uint16_t ucc3min __attribute__((section (".ucc3min"))) = 0xFFFF;
-uint16_t ucc3max __attribute__((section (".ucc3max"))) = 0xFFFF;
+uint16_t ucc1min __attribute__((section (".ucc1min"))) = 0xe246;
+uint16_t ucc1max __attribute__((section (".ucc1max"))) = 0xe29e;
+uint16_t ucc2min __attribute__((section (".ucc2min"))) = 0xe2a0;
+uint16_t ucc2max __attribute__((section (".ucc2max"))) = 0xe2fc;
+uint16_t ucc3min __attribute__((section (".ucc3min"))) = 0xe2fe;
+uint16_t ucc3max __attribute__((section (".ucc3max"))) = 0xe32c;
 uint16_t ucc4min __attribute__((section (".ucc4min"))) = 0xFFFF;
 uint16_t ucc4max __attribute__((section (".ucc4max"))) = 0xFFFF;
 uint16_t ucc5min __attribute__((section (".ucc5min"))) = 0xFFFF;
@@ -91,6 +91,17 @@ __attribute__ ((section (".region_2"))) int passwordComparison(char *actual, cha
     }
 }
 
+
+// A dummy function to fill another region so the defualt build matches every other tests hardware 
+__attribute__ ((section (".region_3"))) void spaceWaster(char *dst, char *src){
+    int n = strlen(src);
+    for(int i=0; i<n; i++){
+        dst[i] = src[i];
+    }
+    
+}
+
+
 // A dummy ISR
 ISR(PORT1,TCB){
 	P1IFG &= ~P1IFG;
@@ -139,6 +150,8 @@ int main(void)
 	    getUserInput(buffer, input);
         // Demonstrates that the program can freely call any function within a UCC
 	    stringCopy(buffer_two, "test");
+        // Tricking the compiler into keeping the third region
+        spaceWaster(buffer_two, "test");
 	     
 	    // Entering UCC two
 	    result = passwordComparison(buffer, test_password);

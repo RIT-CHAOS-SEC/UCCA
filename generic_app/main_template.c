@@ -91,6 +91,17 @@ __attribute__ ((section (".region_2"))) int passwordComparison(char *actual, cha
     }
 }
 
+
+// A dummy function to fill another region so the defualt build matches every other tests hardware 
+__attribute__ ((section (".region_3"))) void spaceWaster(char *dst, char *src){
+    int n = strlen(src);
+    for(int i=0; i<n; i++){
+        dst[i] = src[i];
+    }
+    
+}
+
+
 // A dummy ISR
 ISR(PORT1,TCB){
 	P1IFG &= ~P1IFG;
@@ -139,6 +150,8 @@ int main(void)
 	    getUserInput(buffer, input);
         // Demonstrates that the program can freely call any function within a UCC
 	    stringCopy(buffer_two, "test");
+        // Tricking the compiler into keeping the third region
+        spaceWaster(buffer_two, "test");
 	     
 	    // Entering UCC two
 	    result = passwordComparison(buffer, test_password);

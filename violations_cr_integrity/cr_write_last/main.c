@@ -106,7 +106,7 @@ int main(void)
 	eint();
 
         // Attempts to write to the last address in CR
-        *((uint16_t*)(METADATA_END+4)) = 0xE789;
+        *((uint16_t*)(METADATA_END)) = 0xE789;
 
 	 // serves as the user input. Change from chaos to test an invalid password
 	 char input[6] = {'c', 'h', 'a', 'o', 't', '\0'};

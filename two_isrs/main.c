@@ -12,12 +12,12 @@
 #define METADATA_END  (METADATA_START + 12) // 4 bytes per region and assuming 2 regions
 
 // UCC definitions
-uint16_t ucc1min __attribute__((section (".ucc1min"))) = 0xE27E;
-uint16_t ucc1max __attribute__((section (".ucc1max"))) = 0xE2D6;
-uint16_t ucc2min __attribute__((section (".ucc2min"))) = 0xE2D8;
-uint16_t ucc2max __attribute__((section (".ucc2max"))) = 0xE334;
+uint16_t ucc1min __attribute__((section (".ucc1min"))) = 0xE2CE;
+uint16_t ucc1max __attribute__((section (".ucc1max"))) = 0xE326;
+uint16_t ucc2min __attribute__((section (".ucc2min"))) = 0xE328;
+uint16_t ucc2max __attribute__((section (".ucc2max"))) = 0xE384;
 uint16_t ucc3min __attribute__((section (".ucc3min"))) = 0xE118;
-uint16_t ucc3max __attribute__((section (".ucc3max"))) = 0xE166;
+uint16_t ucc3max __attribute__((section (".ucc3max"))) = 0xE1B6;
 
 
 

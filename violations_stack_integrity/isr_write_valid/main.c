@@ -12,10 +12,10 @@
 #define METADATA_END  (METADATA_START + 12) // 4 bytes per region and assuming 2 regions
 
 // UCC defintions
-uint16_t ucc1min __attribute__((section (".ucc1min"))) = 0xE242;
+uint16_t ucc1min __attribute__((section (".ucc1min"))) = 0xE244;
 uint16_t ucc1max __attribute__((section (".ucc1max"))) = 0xE29C;
 uint16_t ucc2min __attribute__((section (".ucc2min"))) = 0xE29E;
-uint16_t ucc2max __attribute__((section (".ucc2max"))) = 0xE300;
+uint16_t ucc2max __attribute__((section (".ucc2max"))) = 0xE2FA;
 uint16_t ucc3min __attribute__((section (".ucc3min"))) = 0xEF00;
 uint16_t ucc3max __attribute__((section (".ucc3max"))) = 0xEF2A;
 
@@ -66,8 +66,6 @@ of the device it wouldnt be in an untrusted region however we made it a second r
 __attribute__ ((section (".region_2"))) int passwordComparison(char *actual, char *attempt){
     int n = strlen(actual);
     int m = strlen(attempt);
-    
-    *((uint16_t*)(0x61FE)) = 0xE123;  // an invalid write from another test
 
     if (n!=m){
         return -1;
