@@ -8,6 +8,8 @@ In this paper, we tackle this problem by proposing, demonstrating security, and 
 
 	├── co-located_isr
 	│   └── simulation
+	├── generic_app
+	│   └── simulation
 	├── img
 	├── msp_bin
 	├── openmsp430
@@ -19,6 +21,7 @@ In this paper, we tackle this problem by proposing, demonstrating security, and 
 	│   └── simulation
 	├── scripts
 	│   ├── build
+	│       └── hardware_templates
 	│   └── verif-tools
 	├── simple_app
 	│   └── simulation
@@ -72,25 +75,26 @@ Ubuntu 20.04.2
 
 Dependencies on Ubuntu:
 
-		sudo apt-get install bison pkg-config gawk clang flex gcc-msp430 iverilog tcl-dev
-		cd scripts
-		sudo make install
+	sudo apt-get install bison pkg-config gawk clang flex gcc-msp430 iverilog tcl-dev
+	cd scripts
+	sudo make install
 
 ## Building UCCA Software 
 
 To generate the Microcontroller program memory configuration containing UCC definitions (CR) and sample applications we are going to use the Makefile inside the scripts directory:
 
-        cd scripts
+    cd scripts
 
-This repository accompanies 6 categories of test cases: co-located_isr, simple_app, two_isrs, violations_cr_integrity, violations_return_integrity, and violations_stack_integrity. (See [Description of Provided test-cases] for details on each test case)
-These test cases correspond to three benign executions (co-located_isr, simple_app, two_isrs) and scenarios where the device is reset due to a violation that could be used to attack the correctness of the execution.
+This repository accompanies 7 categories of test cases: co-located_isr, generic_app, simple_app, two_isrs, violations_cr_integrity, violations_return_integrity, and violations_stack_integrity. (See [Description of Provided test-cases](#description-of-provided-test-cases) for details on each test case)
+These test cases correspond to three benign executions (co-located_isr, simple_app, two_isrs) and three scenarios where the device is reset due to a control-flow violation (violations_X). Generic_app represents an easily customizable program to test UCCA with arbitrary binaries. However by default generic_app is a clone of simple_app.
+
 To build UCCA for a specific test-case run:
 
-        make "name of test-case"
+    make "name of test-case"
 
 For instance:
 
-        make simple_app
+    make simple_app
 
 to build the software including the binaries of simple_app test case.
 Note that this step will not run any simulation, but simply generate the MSP430 binaries corresponding to the test-case of choice. Also note that upon first build it may be necessary to give execute permissions (chmod +x) to "/scripts/build/uccasim" and "/scripts/build/ihex2mem.tcl".
@@ -101,23 +105,29 @@ As a result of the build, two files pmem.mem and cr.mem should be created inside
 
 - cr.mem: contains UCC definitions.
 
+It will also build the appropriate hardware files for this test. By default all tests use 3 UCCs. As such this hardware generation will only matter if you change generic_app (or any test case).
+
 In the next steps, during synthesis, these files will be loaded to the MSP430 memory when we run the UCCA simulation using VIVADO simulation tools.
 
 If you want to clean the built files run:
 
-        make clean
+    make clean
 
-        Note: Latest Build tested using msp430-gcc (GCC) 4.6.3 2012-03-01
+**Note**: Latest Build tested using msp430-gcc (GCC) 4.6.3 2012-03-01
 
 To test UCCA with a different application you will need to repeat these steps to generate the new "pmem.mem" file and re-run synthesis.
 
 ## Creating a UCCA project on Vivado and Running Synthesis
 
-This is an example of how to synthesize and prototype UCCA using Basys3 FPGA and XILINX Vivado v2022.1 (64-bit) IDE for Linux
+This is an example of how to synthesize and prototype UCCA using Basys3 FPGA and XILINX Vivado v2022.1 (64-bit) IDE for Linux. While this work was completed on Vivado v2022.1, the following should still hold for newer versions of Vivado.
 
 - Vivado IDE is available to download at: https://www.xilinx.com/support/download.html
 
 - Basys3 Reference/Documentation is available at: https://reference.digilentinc.com/basys3/refmanual
+
+**Note:** When installing Vivado, the installation may hang indefinitly at the `final processing` step. To avoid this install the following packages:
+
+    apt-get install libtinfo5 libncurses5
 
 #### Creating a Vivado Project for UCCA
 
@@ -131,28 +141,28 @@ This is an example of how to synthesize and prototype UCCA using Basys3 FPGA and
 
 4- In the "Add Sources" window, select Add Files and add all *.v and *.mem files contained in the following directories of this repository:
 
-        openmsp430/fpga
-        openmsp430/msp_core
-        openmsp430/msp_memory
-        openmsp430/msp_periph
-        /ucca/hw-mod
-        /msp_bin
+    openmsp430/fpga
+    openmsp430/msp_core
+    openmsp430/msp_memory
+    openmsp430/msp_periph
+    /ucca/hw-mod
+    /msp_bin
 
 and select Next.
 
-Note that /msp_bin contains the pmem.mem and cr.mem binaries, generated in step [Building UCCA Software].
+**Note:** /msp_bin contains the pmem.mem and cr.mem binaries, generated in step [Building UCCA Software](#building-UCCA-software).
 
 5- In the "Add Constraints" window, select add files and add the file
 
-        openmsp430/contraints_fpga/Basys-3-Master.xdc
+    openmsp430/contraints_fpga/Basys-3-Master.xdc
 
 and select Next.
 
-        Note: this file needs to be modified accordingly if you are running UCCA in a different FPGA.
+**Note:** this file needs to be modified accordingly if you are running UCCA in a different FPGA.
 
 6- In the "Default Part" window select "Boards", search for Basys3, select it, and click Next.
 
-        Note: if you don't see Basys3 as an option you may need to download Basys3 to your Vivado installation.
+**Note:** if you don't see Basys3 as an option you may need to download Basys3 to your Vivado installation.
 
 7- Select "Finish". This will conclude the creation of a Vivado Project for UCCA.
 
@@ -167,9 +177,9 @@ Now we are ready to synthesize openmsp430 with UCCA hardware the following step 
 
 10- On the left menu of the PROJECT MANAGER click "Run Synthesis" and select execution parameters (e.g., number of CPUs used for synthesis) according to your PC's capabilities.
 
-11- If synthesis succeeds, you will be prompted with the next step to "Run Implementation". You *do not* need to "Run Implementation" to simulate UCCA.
+11- If synthesis succeeds, you will be prompted with the next step to "Run Implementation". You ***do not*** need to "Run Implementation" to simulate UCCA.
 
-To simulate UCCA using VIVADO sim-tools, continue following the instructions on [Running UCCA on Vivado Simulation Tools].
+To simulate UCCA using VIVADO sim-tools, continue following the instructions on [Running UCCA on Vivado Simulation Tools](#running-ucca-on-vivado-simulation-tools).
 
 ## Running UCCA on Vivado Simulation Tools
 
@@ -208,13 +218,13 @@ In Vivado simulation, all test cases provided loop infinitely by default. For al
 
 To determine the address of an instruction, e.g., the start and end addresses of UCC (values of UCC_min and UCC_max, per UCCA's paper) one can check the compilation file at scripts/tmp-build/XX/ucca.lst  (where XX is the name of the test case, i.e., if you run "make simple_app", XX=simple_app). In this file search for the name of the function of interest, e.g., "regionOne" or "secureFunction", etc.
 
-#### NOTE: To simulate a different test case you need to re-run "make test-case_name" to generate the corresponding pmem.mem file and re-run the synthesis step (step 10 in [Creating a Vivado Project for UCCA]) on Vivado. 
+#### NOTE: To simulate a different test case you need to re-run "make test-case_name" to generate the corresponding pmem.mem file and re-run the synthesis step (step 10 in [Creating a Vivado Project for UCCA](#creating-a-vivado-project-for-ucca)) on Vivado. 
 
 ## Description of Provided test-cases
 
 For details on how UCCA isolates regions in memory (UCCs) and mitigates attack escalation please check the UCCA paper. 
 
-All test cases support three UCCs, however, not every test uses all three. The first UCC isolates a vulnerable buffer copy that is meant to simulate user input. The second UCC isolates the password comparison functionality. The password comparison function is not vulnerable and does not need to be isolated, however, this isolation allows for testing UCCA with multiple UCCs. The third UCC is used to isolate ISRs from the rest of the system. This is the default configuration, but some tests do alter this isolation. We explicitly state when tests break from this convention. All test cases were configured to run as is. If edited, the region definitions at the top of the respective test's main.c may need to be adjusted.
+All test cases support three UCCs, however, not every test uses all three. The first UCC isolates a vulnerable buffer copy that is meant to simulate user input. The second UCC isolates the password comparison functionality. The password comparison function is not vulnerable and does not need to be isolated, however, this isolation allows for testing UCCA with multiple UCCs. The third UCC is used to isolate ISRs from the rest of the system. This is the default configuration, but some tests do alter this isolation. We explicitly state when tests break from this convention. All test cases were configured to run as is. If edited, the region definitions at the top of the respective test's main.c may need to be adjusted. The only exception is generic_app which was built specifically to be edited. We will discuss this changes in more detail later.
 
 #### 1- simple_app:
 
@@ -278,55 +288,73 @@ This is another test case that runs indefinitely (ucca_reset is always 0) and is
 
 The UCCs are defined as follows: E2CE-E326 (user input), E328-E384 (password comparison), and E118-E1B6 (ISRs). Unlike the previous cases, these interrupts contain a counting loop. This just allows the ISR to run longer making them easier to interrupt if desired. Similarly, an interrupt can only be triggered if the GIE bit is high (set to 1). Thus once the ISR clears its interrupt flag, it also sets the GIE bit back to high. To simulate nested interrupts simply trigger an interrupt using one of the buttons, wait for the GIE bit to go back to high, and then trigger an interrupt with the remaining button. Remember to clear each button after the interrupt has been accepted.
 
-#### 5- violation_cr_integrity:
 
-###### 5.1- cr_write_fst
+#### 5- generic_app
+
+By default generic_app is a clone of simple_app. However generic_app was designed to ease testing UCCA with any program. To test a custom program, add your code to the main_template.c file. Next mark the untrusted functionality with the approriate attribute tag:
+
+	__attribute__ ((section (".region_X")))
+
+where X is a number. Then simply navigate to the scripts directory and run:
+
+	make generic_app 
+
+This will compile the program, find and update the UCC defintions, and build the required hardware. Then simply resynthesize the Vivado project (step 10 in [Creating a UCC project on Vivado and RUnning Sythnesis](#creating-a-ucca-project-on-vivado-and-running-synthesis)) and rerun the simulation.
+
+**Note:** If the application requires more than 8 UCCs you will need to:
+- Add more UCC definitions to the top of the template file
+- Add more UCCs to both the .text and .config sections of the scripts/build/linker.msp430.x file
+- Update the UCCS constant at the top of the scripts/build/region_defintions.py file
+
+#### 6- violation_cr_integrity:
+
+###### 6.1- cr_write_fst
 
 This corresponds to a test case where the program attempts to write to the first address in CR. CR Integrity is violated, ucca_reset is set to 1 and the device is reset (pc = 0).
 
 This should occur around 29 microseconds into the simulation.
 
-###### 5.2- cr_write_last
+###### 6.2- cr_write_last
 
 This corresponds to a test case where the program attempts to write to the last address in CR. CR Integrity is violated, ucca_reset is set to 1 and the device is reset (pc = 0).
 
 This should occur around 29 microseconds into the simulation.
 
-###### 5.3- cr_write_mid
+###### 6.3- cr_write_mid
 
 This corresponds to a test case where the program attempts to write to the middle of CR. CR Integrity is violated, ucca_reset is set to 1 and the device is reset (pc = 0).
 
 This should occur around 29 microseconds into the simulation.
 
-#### 6- violation_return_integrity:
+#### 7- violation_return_integrity:
 
-###### 6.1- isr_return_invalid
+###### 7.1- isr_return_invalid
 
 This corresponds to a test case where the ISR is untrusted and tries to return to an arbitrary location in the program. This violates return integrity for the UCC isolating the ISR, causes ucca_reset to be set to 1, and resets the device (pc = 0). To perform the test we simply instrument the ISR to jump to the secure increment function.
 
 To simulate the violation you simply need to trigger the ISR. However, before you can trigger the interrupt the system must initialize. Thus attempts to trigger the interrupt within the first 30 microseconds of the simulation will be ignored. Once the system is configured and the interrupt is executing (pc = E100), the attack and subsequent reset should occur about 5 microseconds later in the simulation. 
 
-###### 6.2- malicious_return_complex
+###### 7.2- malicious_return_complex
 
 This corresponds to a test case where execution jumps from the middle of a UCC to UCC_max of the same UCC. Exploiting the vulnerable buffer within the "getUserInput" function causes the function to return to UCC_max. As execution hasn't left UCC no violation has occurred, however as execution maliciously jumped to the final instruction of UCC, the stack hasn't been properly cleaned. Data on the stack is misinterpreted as the return address for UCC causing it to return to the wrong address in memory. This violates return integrity, ucca_reset is set to 1 and the device is reset (pc = 0). 
 
 This should occur around 133 microseconds into the simulation.
 
-###### 6.3- malicious_return_simple
+###### 7.3- malicious_return_simple
 
 This corresponds to a test case where execution jumps from UCC_max of a UCC to an address other than the actual return address. This violates return integrity, ucca_reset is set to 1 and the device is reset (pc = 0). This test is simple as the binary is instrumented to "perform the attack" rather than exploiting the overflow like in the complex case.
 
 This should occur around 132 microseconds into the simulation.
 
-#### 7- violation_stack_integrity:
+#### 8- violation_stack_integrity:
 
-###### 7.1- isr_write_invalid:
+###### 8.1- isr_write_invalid:
 
 This corresponds to a test case where the implemented ISR is untrusted and attempts to overwrite the data of another function on the stack. This violates the stack isolation (ucca_reset = 1) resulting in a device reset (pc = 0). To simulate this behavior the ISR is simply instrumented to write directly to an address known to be below the base pointer.
 
 Again this simply requires the interrupt to be triggered, however, the interrupt cannot be triggered within the first 30 microseconds of the simulation as the device is still being configured. Once the interrupt has been triggered the violation and the subsequent device reset should occur within 5 microseconds
 
-###### 7.2- isr_write_valid:
+###### 8.2- isr_write_valid:
 
 This corresponds to a test case where the ISR is benign and attempts to overwrite the data of another function on the stack. This demonstrates that unisolated ISRs maintain the ability to edit the stack as needed, even if interrupting a UCC. 
 
@@ -334,31 +362,31 @@ The UCCs for this test are defined for the following regions of memory: E242-E29
 
 Like previous interrupt-based tests, this behavior can be performed anytime after the first 30 microseconds of the simulation. However, to best demonstrate the unlocking of the stack for interrupts the interrupt should be triggered from within another UCC. Execution first enters a UCC around 101 microseconds into the execution. From there simply trigger the interrupt. The ISR should run normally and execution will then return to the UCC.
 
-###### 7.3- malicious_stack_write_complex
+###### 8.3- malicious_stack_write_complex
 
 This corresponds to a test case where a UCC attempts to write to an address on the stack below its own stack frame (D_addr below Base Pointer). Exploiting the vulnerable buffer within the "getUserInput" function causes UCC to attempt to write below its Base Pointer. This violates the stack isolation, ucca_reset is set to 1 and the device is reset (pc = 0).
 
 This should occur around 233 microseconds into the simulation.
 
-###### 7.4- malicious_stack_write_simple
+###### 8.4- malicious_stack_write_simple
 
 This corresponds to a test case where a UCC attempts to write to an address on the stack below its own stack frame (D_addr below Base Pointer). This violates the stack isolation, ucca_reset is set to 1 and the device is reset (pc = 0). This test is simple as the program is instrumented to write directly to the stack rather than exploiting the overflow like in the complex case.
 
 This should occur around 204 microseconds into the simulation.
 
-###### 7.5 malicious_stack_pointer
+###### 8.5 malicious_stack_pointer
 
 This corresponds to a test case where UCC attempts to write malicious data to the stack and return early corrupting the stack pointer and creating an adversarial controlled stack. This violates the stack integrity as the stack pointer doesn't match the base pointer so ucca_reset is set to 1 anf the device is reset. To make testing easier this sample program is instrumented similarly to malicious_stack_write_simple.
 
-The attack and subsequent reset should occure around 204 microseconds into the simulation.
+The attack and subsequent reset should occure around 132 microseconds into the simulation.
 
-###### 7.6- write_to_pointer
+###### 8.6- write_to_pointer
 
 This corresponds to a test case where a UCC attempts to write to an address on the stack below its own stack frame (D_addr below Base Pointer). A stack buffer is initialized outside UCC and a reference to the buffer is passed to UCC. When UCC attempts to write this buffer the stack isolation is violated, ucca_reset is set to 1 and the device is reset (pc = 0). This demonstrates that the stack isolation prevents references to variables on the stack from being used within a UCC. However, UCC can still access values in the heap as shown in simple_app and all other test cases.
 
 This should occur around 114 microseconds into the simulation.
 
-#### 8- Examples of simulation test cases are provided below.
+#### 9- Examples of simulation test cases are provided below.
 
 - Simulation window for a benign execution of simple_app: 
 
