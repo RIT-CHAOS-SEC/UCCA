@@ -48,6 +48,7 @@ module  tb_openMSP430_fpga;
 wire         [7:0] p3_dout = dut.p3_dout;
 //wire        exec   = dut.VAPE_metadata_0.exec;
 wire       [15:0] pc    = dut.openMSP430_0.inst_pc;
+wire  gie = dut.openMSP430_0.gie;
 
 //
 // Wire & Register definition

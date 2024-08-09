@@ -79,6 +79,14 @@ Dependencies on Ubuntu:
 	cd scripts
 	sudo make install
 
+**Note:** When testing on Ubuntu 22.04, we ran into an issue running `sudo make install`. When building the `passes/sat/freduce.o` functionality (64% through the install) the make script threw an error stating that:
+	
+	`numeric_limits` is not a member of `std`
+
+To the best of our knowledge this seems to be a change in more recent versions of C++, but we are not certain when this change officially occured. As such if you run into this error, navigate to the `scripts/verif-tools` directory and open `verilog2smv-1.1.2.tar.bz2`. Once in the archive, enter the `lib` directory and open `yosys-master.zip`. Finally in `yosys-master.zip` go to `passes/sat/` and open `freduce.cc`. Then to fix the error simply add the following include statement to the file:
+
+	#include <limits>
+
 ## Building UCCA Software 
 
 To generate the Microcontroller program memory configuration containing UCC definitions (CR) and sample applications we are going to use the Makefile inside the scripts directory:
