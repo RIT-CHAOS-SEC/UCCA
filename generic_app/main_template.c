@@ -9,15 +9,27 @@
 //#define WDTPW               (0x5A00)
 
 #define METADATA_START 0x160
-#define METADATA_END  (METADATA_START + 12) // 4 bytes per region and assuming 2 regions
+#define METADATA_END  (METADATA_START + CR_SIZE) // 4 bytes per region and assuming 2 regions
 
-// UCC definitions
-uint16_t ucc1min __attribute__((section (".ucc1min"))) = 0xE242;
-uint16_t ucc1max __attribute__((section (".ucc1max"))) = 0xE29A;
-uint16_t ucc2min __attribute__((section (".ucc2min"))) = 0xE29C;
-uint16_t ucc2max __attribute__((section (".ucc2max"))) = 0xE2F8;
-uint16_t ucc3min __attribute__((section (".ucc3min"))) = 0xE100;
-uint16_t ucc3max __attribute__((section (".ucc3max"))) = 0xE12A;
+// UCC definition placeholders. If more than eight regions are required simply
+// copy these lines and update them accordingly. Also ensure to update scripts/linker.msp430.x 
+// to create more labeled memory.
+uint16_t ucc1min __attribute__((section (".ucc1min"))) = "1Sta";
+uint16_t ucc1max __attribute__((section (".ucc1max"))) = "1Sto";
+uint16_t ucc2min __attribute__((section (".ucc2min"))) = "2Sta";
+uint16_t ucc2max __attribute__((section (".ucc2max"))) = "2Sto";
+uint16_t ucc3min __attribute__((section (".ucc3min"))) = "3Sta";
+uint16_t ucc3max __attribute__((section (".ucc3max"))) = "3Sto";
+uint16_t ucc4min __attribute__((section (".ucc4min"))) = "4Sta";
+uint16_t ucc4max __attribute__((section (".ucc4max"))) = "4Sto";
+uint16_t ucc5min __attribute__((section (".ucc5min"))) = "5Sta";
+uint16_t ucc5max __attribute__((section (".ucc5max"))) = "5Sto";
+uint16_t ucc6min __attribute__((section (".ucc6min"))) = "6Sta";
+uint16_t ucc6max __attribute__((section (".ucc6max"))) = "6Sto";
+uint16_t ucc7min __attribute__((section (".ucc7min"))) = "7Sta";
+uint16_t ucc7max __attribute__((section (".ucc7max"))) = "7Sto";
+uint16_t ucc8min __attribute__((section (".ucc8min"))) = "8Sta";
+uint16_t ucc8max __attribute__((section (".ucc8max"))) = "8Sto";
 
 
 /**
@@ -79,16 +91,32 @@ __attribute__ ((section (".region_2"))) int passwordComparison(char *actual, cha
     }
 }
 
-// Another day, another dummy ISR. Now with another tests code
+
+// A dummy function to fill another region so the defualt build matches every other tests hardware 
+__attribute__ ((section (".region_3"))) void spaceWaster(char *dst, char *src){
+    int n = strlen(src);
+    for(int i=0; i<n; i++){
+        dst[i] = src[i];
+    }
+    
+}
+
+
+// A dummy ISR
 ISR(PORT1,TCB){
 	P1IFG &= ~P1IFG;
-	__asm__ volatile("br #0xe29a" "\n\t");
 	P5OUT = ~P5OUT;
 }
 
 
 // MAIN /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/* By defualt this file is the same as simple app. However unlike simple app,
+  this file allows you to add and isolate any code. Simply add whatever program you 
+  want to test with and mark the untrusted functionality with the appropriate 
+  __attribute__ tag. If you need more than 8 UCCs you will need to add more region definitions
+  to the top of this file as well as to scripts/linker.msp430.x
+*/
 int main(void)
 {
 
@@ -105,11 +133,8 @@ int main(void)
 	
 	eint();
 
-        // Attempts to write to an address in the middle of CR
-        *((uint16_t*)(METADATA_START + 4)) = 0xE456;
-
 	 // serves as the user input. Change from chaos to test an invalid password
-	 char input[6] = {'c', 'h', 'a', 'o', 't', '\0'};
+	 char input[6] = {'c', 'h', 'a', 'o', 's', '\0'};
 
          while (1){
          
@@ -120,11 +145,13 @@ int main(void)
             memset(buffer_two, 0, 5);
             
             int result = -1;
-        
+            
         // Execution enters the first UCC
 	    getUserInput(buffer, input);
         // Demonstrates that the program can freely call any function within a UCC
 	    stringCopy(buffer_two, "test");
+        // Tricking the compiler into keeping the third region
+        spaceWaster(buffer_two, "test");
 	     
 	    // Entering UCC two
 	    result = passwordComparison(buffer, test_password);

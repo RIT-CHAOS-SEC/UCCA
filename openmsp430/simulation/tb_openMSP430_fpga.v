@@ -48,6 +48,7 @@ module  tb_openMSP430_fpga;
 wire         [7:0] p3_dout = dut.p3_dout;
 //wire        exec   = dut.VAPE_metadata_0.exec;
 wire       [15:0] pc    = dut.openMSP430_0.inst_pc;
+wire  gie = dut.openMSP430_0.gie;
 
 //
 // Wire & Register definition
@@ -152,23 +153,23 @@ wire [15:0] OP_ret =     dut.openMSP430_0.hdmod_0.op_dest;
 
 // UCC SPECIFIC SIGNALS
 
-wire [1:0] ucc1_state = dut.openMSP430_0.hdmod_0.UCCA_region_0.ucc_state;
-wire       ucc1_return_integrity_reset = dut.openMSP430_0.hdmod_0.UCCA_region_0.return_integrity_reset;
-wire       ucc1_expected_return = dut.openMSP430_0.hdmod_0.UCCA_region_0.return_integrity_0.return_addr;
-wire       ucc1_stack_integrity_reset = dut.openMSP430_0.hdmod_0.UCCA_region_0.stack_protection_reset;
-wire       ucc1_base_pointer = dut.openMSP430_0.hdmod_0.UCCA_region_0.stack_protection_0.ebp;
+wire [1:0]  ucc1_state = dut.openMSP430_0.hdmod_0.UCCA_region_0.ucc_state;
+wire        ucc1_return_integrity_reset = dut.openMSP430_0.hdmod_0.UCCA_region_0.return_integrity_reset;
+wire [15:0] ucc1_expected_return = dut.openMSP430_0.hdmod_0.UCCA_region_0.return_integrity_0.return_addr;
+wire        ucc1_stack_integrity_reset = dut.openMSP430_0.hdmod_0.UCCA_region_0.stack_protection_reset;
+wire [15:0] ucc1_base_pointer = dut.openMSP430_0.hdmod_0.UCCA_region_0.stack_protection_0.ebp;
 	
-wire [1:0] ucc2_state = dut.openMSP430_0.hdmod_0.UCCA_region_1.ucc_state;
-wire       ucc2_return_integrity_reset = dut.openMSP430_0.hdmod_0.UCCA_region_1.return_integrity_reset;
-wire       ucc2_expected_return = dut.openMSP430_0.hdmod_0.UCCA_region_1.return_integrity_0.return_addr;
-wire       ucc2_stack_integrity_reset = dut.openMSP430_0.hdmod_0.UCCA_region_1.stack_protection_reset;
-wire       ucc2_base_pointer = dut.openMSP430_0.hdmod_0.UCCA_region_1.stack_protection_0.ebp;
+wire [1:0]  ucc2_state = dut.openMSP430_0.hdmod_0.UCCA_region_1.ucc_state;
+wire        ucc2_return_integrity_reset = dut.openMSP430_0.hdmod_0.UCCA_region_1.return_integrity_reset;
+wire [15:0] ucc2_expected_return = dut.openMSP430_0.hdmod_0.UCCA_region_1.return_integrity_0.return_addr;
+wire        ucc2_stack_integrity_reset = dut.openMSP430_0.hdmod_0.UCCA_region_1.stack_protection_reset;
+wire [15:0] ucc2_base_pointer = dut.openMSP430_0.hdmod_0.UCCA_region_1.stack_protection_0.ebp;
 
-wire [1:0] ucc3_state = dut.openMSP430_0.hdmod_0.UCCA_region_2.ucc_state;
-wire       ucc3_return_integrity_reset = dut.openMSP430_0.hdmod_0.UCCA_region_2.return_integrity_reset;
-wire       ucc3_expected_return = dut.openMSP430_0.hdmod_0.UCCA_region_2.return_integrity_0.return_addr;
-wire       ucc3_stack_integrity_reset = dut.openMSP430_0.hdmod_0.UCCA_region_2.stack_protection_reset;
-wire       ucc3_base_pointer = dut.openMSP430_0.hdmod_0.UCCA_region_2.stack_protection_0.ebp;
+wire [1:0]  ucc3_state = dut.openMSP430_0.hdmod_0.UCCA_region_2.ucc_state;
+wire        ucc3_return_integrity_reset = dut.openMSP430_0.hdmod_0.UCCA_region_2.return_integrity_reset;
+wire [15:0] ucc3_expected_return = dut.openMSP430_0.hdmod_0.UCCA_region_2.return_integrity_0.return_addr;
+wire        ucc3_stack_integrity_reset = dut.openMSP430_0.hdmod_0.UCCA_region_2.stack_protection_reset;
+wire [15:0] ucc3_base_pointer = dut.openMSP430_0.hdmod_0.UCCA_region_2.stack_protection_0.ebp;
 
 // RESET SIGNAL
 //wire         puc_rst = dut.puc_rst;

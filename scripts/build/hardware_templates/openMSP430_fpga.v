@@ -370,13 +370,7 @@ wire               hw_uart_rxd;
 
 // CR peripheral wires
 wire        [15:0] per_dout_cr_peripheral;
-wire        [15:0] ucc_min_0;
-wire        [15:0] ucc_max_0;
-wire        [15:0] ucc_min_1;
-wire        [15:0] ucc_max_1;
-wire        [15:0] ucc_min_2;
-wire        [15:0] ucc_max_2;
-
+UCC_WIRES
 
 // Others
 wire               reset_pin;
@@ -586,12 +580,7 @@ openMSP430 openMSP430_0 (
     .wkup              (1'b0),          // ASIC ONLY: System Wake-up (asynchronous and non-glitchy)
     
     // Passing the UCC defintions into the MSP430 core  
-    .ucc_min_0         (ucc_min_0),
-    .ucc_max_0         (ucc_max_0),
-    .ucc_min_1         (ucc_min_1),
-    .ucc_max_1         (ucc_max_1),
-    .ucc_min_2         (ucc_min_2),
-    .ucc_max_2         (ucc_max_2)
+UCC_INPUTS
 
     
 );
@@ -756,12 +745,7 @@ CR_peripheral CR_peripheral_0 (
 
 // OUTPUTs
     .per_dout     (per_dout_cr_peripheral), // Peripheral data output
-    .ucc_min_0    (ucc_min_0),
-    .ucc_max_0    (ucc_max_0),
-    .ucc_min_1    (ucc_min_1),
-    .ucc_max_1    (ucc_max_1),
-    .ucc_min_2    (ucc_min_2),
-    .ucc_max_2    (ucc_max_2)
+UCC_OUTPUTS
 
 );
 

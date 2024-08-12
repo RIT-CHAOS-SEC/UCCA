@@ -106,12 +106,7 @@ module  openMSP430 (
     wkup,                                    // ASIC ONLY: System Wake-up (asynchronous and non-glitchy)
     
     //UCCA Inputs
-    ucc_min_0,
-    ucc_max_0,
-    ucc_min_1,
-    ucc_max_1,
-    ucc_min_2,
-    ucc_max_2
+UCC_DEFS
 
     
 );
@@ -181,13 +176,7 @@ input                scan_enable;            // ASIC ONLY: Scan enable (active d
 input                scan_mode;              // ASIC ONLY: Scan mode
 input                wkup;                   // ASIC ONLY: System Wake-up (asynchronous and non-glitchy)
 
-input         [15:0] ucc_min_0;
-input         [15:0] ucc_max_0;
-input         [15:0] ucc_min_1;
-input         [15:0] ucc_max_1;
-input         [15:0] ucc_min_2;
-input         [15:0] ucc_max_2;
-
+UCC_INST
 
 
 //=============================================================================
@@ -609,13 +598,7 @@ hwmod hdmod_0(
     //.mdb_out        (eu_mdb_out),
     .op_dest        (op_dest),
     
-    .ucc_min_0      (ucc_min_0),
-    .ucc_max_0      (ucc_max_0),
-    .ucc_min_1      (ucc_min_1),
-    .ucc_max_1      (ucc_max_1),
-    .ucc_min_2      (ucc_min_2),
-    .ucc_max_2      (ucc_max_2),
-
+UCC_INPUTS
 
     .reset          (ucca_reset)
 );

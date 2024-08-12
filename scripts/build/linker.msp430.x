@@ -97,11 +97,21 @@ SECTIONS
     . = ALIGN(2);
     PROVIDE (__exec_leave = .) ;
     *(.exec.leave)
-    *(.regionOne)
+    *(.region_1)
     . = ALIGN(2);
-    *(.regionTwo)
+    *(.region_2)
     . = ALIGN(2);
-    *(.regionThree)
+    *(.region_3)
+    . = ALIGN(2);
+    *(.region_4)
+    . = ALIGN(2);
+    *(.region_5)
+    . = ALIGN(2);
+    *(.region_6)
+    . = ALIGN(2);
+    *(.region_7)
+    . = ALIGN(2);
+    *(.region_8)
     . = ALIGN(2);
   }  > REGION_TEXT
   
